@@ -4,6 +4,9 @@ type Project struct {
 	ID               int
 	Name             string
 	Description      string
+	Author           string
+	CreatedOn        string
+	ModifiedOn       string
 	CustomProperties []Property
 }
 
