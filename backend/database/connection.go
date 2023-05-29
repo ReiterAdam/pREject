@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	// _ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -19,9 +18,6 @@ func SetupDB() *sql.DB {
 }
 
 func CheckDB(db *sql.DB) bool {
-	// // Connect to the database
-	// db := SetupDB()
-	// defer db.Close()
 
 	// Get the database schema
 	schema, err := db.Query("SELECT name FROM sqlite_master WHERE type='table'")
