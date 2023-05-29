@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/ReiterAdam/pREject/backend/database"
 	"github.com/ReiterAdam/pREject/backend/models"
@@ -28,18 +29,24 @@ func CreateProjectHandler(c *gin.Context) {
 	} else {
 		log.Print("Database check ...ERROR")
 	}
+	// perform database check, get schema
+	if res {
+		log.Print("Database check ...OK")
+	} else {
+		log.Print("Database check ...ERROR")
+	}
 	// Insert the project to the database
 
 	// prepare  query.
-	stmt, err := db.Prepare("INSERT INTO projects (name, description) VALUES (?, ?)")
+	stmt, err := db.Prepare("INSERT INTO projects (name, description, author, CreatedOn, ModifiedOn) VALUES (?, ?, ?, ?, ?)")
 
 	if checkErr(c, err, "Statement preparation failed!") {
 		return
 	}
-
+	currentTime := getCurrentTime()
 	defer stmt.Close()
 	// execute statement
-	result, err := stmt.Exec(project.Name, project.Description)
+	result, err := stmt.Exec(project.Name, project.Description, project.Author, currentTime, currentTime)
 	if checkErr(c, err, "Statement execution failed!") {
 		return
 	}
@@ -70,7 +77,7 @@ func CreateProjectHandler(c *gin.Context) {
 
 }
 
-func getProjectsHandler(c *gin.Context) {
+func GetProjectsHandler(c *gin.Context) {
 	// get all projects form database
 
 	db := database.SetupDB()
@@ -147,6 +154,12 @@ func deleteProjectHandler(c *gin.Context) {
 
 //  other handlers for positions, etc.
 // ...
+
+func getCurrentTime() string {
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02-15-04")
+	return formattedTime
+}
 
 func checkErr(c *gin.Context, err error, message string) bool {
 	if err != nil {
