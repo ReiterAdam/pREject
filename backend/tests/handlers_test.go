@@ -13,6 +13,7 @@ import (
 )
 
 func TestCreateProjectHandler(t *testing.T) {
+
 	// create new gin router
 	router := gin.Default()
 	// set up route w =ith handler
@@ -48,9 +49,9 @@ func TestCreateProjectHandler(t *testing.T) {
 }
 
 func TestGetProjectsHandler(t *testing.T) {
-	// new gin router
-	router := gin.Default()
 
+	// create new gin router
+	router := gin.Default()
 	// set up handler
 	router.GET("/projects", handlers.GetProjectsHandler)
 
@@ -62,5 +63,26 @@ func TestGetProjectsHandler(t *testing.T) {
 
 	if res.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, but got %d", http.StatusOK, res.Code)
+	}
+}
+
+// check this test bc I dont know if it is ok
+func TestGetProjectByIDHandler(t *testing.T) {
+
+	// create new gin router
+	router := gin.Default()
+	// set up handler
+	router.GET("/projects/:id", handlers.GetProjectByIDHandler)
+
+	// create request, response
+
+	req, _ := http.NewRequest("GET", "/projects/2", nil)
+	res := httptest.NewRecorder()
+
+	router.ServeHTTP(res, req)
+
+	if res.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, res.Code)
+
 	}
 }

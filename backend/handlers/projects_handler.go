@@ -21,20 +21,15 @@ func CreateProjectHandler(c *gin.Context) {
 	// save project to database
 	db := database.SetupDB()
 	defer db.Close()
-	res := database.CheckDB(db)
+	// res := database.CheckDB(db)
 
-	// perform database check, get schema
-	if res {
-		log.Print("Database check ...OK")
-	} else {
-		log.Print("Database check ...ERROR")
-	}
-	// perform database check, get schema
-	if res {
-		log.Print("Database check ...OK")
-	} else {
-		log.Print("Database check ...ERROR")
-	}
+	// // perform database check, get schema
+	// if res {
+	// 	log.Print("Database check ...OK")
+	// } else {
+	// 	log.Print("Database check ...ERROR")
+	// }
+
 	// Insert the project to the database
 
 	// prepare  query.
@@ -83,7 +78,7 @@ func GetProjectsHandler(c *gin.Context) {
 	db := database.SetupDB()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT Name, Description, Author, CreatedOn, ModifiedOn FROM projects")
+	rows, err := db.Query("SELECT ID, Name, Description, Author, CreatedOn, ModifiedOn FROM projects")
 	if checkErr(c, err, "Query execution failed!") {
 		return
 	}
@@ -111,7 +106,7 @@ func GetProjectsHandler(c *gin.Context) {
 
 }
 
-func getProjectByIDHandler(c *gin.Context) {
+func GetProjectByIDHandler(c *gin.Context) {
 	// get projectID from request
 	projectID := c.Param("id")
 
@@ -119,7 +114,7 @@ func getProjectByIDHandler(c *gin.Context) {
 	defer db.Close()
 
 	var project models.Project
-	err := db.QueryRow("SELECT (Name, Description, Author, ModifiedOn, CreatedOn) FROM projects WHERE id = ?", projectID).Scan(&project.ID, &project.Name, &project.Description, &project.Author, &project.ModifiedOn, &project.CreatedOn)
+	err := db.QueryRow("SELECT ID, Name, Description, Author, ModifiedOn, CreatedOn FROM projects WHERE id = ?", projectID).Scan(&project.ID, &project.Name, &project.Description, &project.Author, &project.ModifiedOn, &project.CreatedOn)
 	if checkErr(c, err, "Error while searching for project!") {
 		return
 	}
