@@ -167,15 +167,50 @@ func updateProjectHandler(c *gin.Context) {
 	}
 	currentTime := getCurrentTime()
 	// execute statement
-	result, err := stmt.Exec(project.Name, project.Description, project.Author, currentTime, currentTime)
+	result, err := stmt.Exec(project.Name, project.Description, currentTime, projectID)
 	if checkErr(c, err, "Statement execution failed!") {
 		return
 	}
 
+	// delete existing custom properties from project
+	_, err = db.Exec("DELETE FROM project_properties WHERE project_id = ?", projectID)
+	if checkErr(c, err, "Erasing previous properties failed!") {
+		return
+	}
+
+	// add additional properties of the project
+	for _, prop := range project.CustomProperties {
+		stmt, err = db.Prepare("INSERT INTO project_properties (project_id, property_key, property_value) VALUES (?, ?, ?)")
+
+		if checkErr(c, err, "Statement preparation failed!") {
+			return
+		}
+		_, err = stmt.Exec(projectID, prop.Key, prop.Value)
+
+		if checkErr(c, err, "Statement preparation failed!") {
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Project updated successfully"})
+
 }
 
 func deleteProjectHandler(c *gin.Context) {
-	// logic to delete a project
+	// Get the project ID from the request URL
+	projectID := c.Param("id")
+
+	// Delete the project from the database
+	db := setupDB()
+	defer db.Close()
+
+	// Delete the project
+	_, err := db.Exec("DELETE FROM projects WHERE id = ?", projectID)
+	if checkErr(c, err, "Error, project not deleted!") {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Project deleted successfully"})
 }
 
 //  other handlers for positions, etc.
