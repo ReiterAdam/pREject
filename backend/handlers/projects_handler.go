@@ -167,7 +167,7 @@ func updateProjectHandler(c *gin.Context) {
 	}
 	currentTime := getCurrentTime()
 	// execute statement
-	result, err := stmt.Exec(project.Name, project.Description, currentTime, projectID)
+	_, err = stmt.Exec(project.Name, project.Description, currentTime, projectID)
 	if checkErr(c, err, "Statement execution failed!") {
 		return
 	}
@@ -201,7 +201,7 @@ func deleteProjectHandler(c *gin.Context) {
 	projectID := c.Param("id")
 
 	// Delete the project from the database
-	db := setupDB()
+	db := database.SetupDB()
 	defer db.Close()
 
 	// Delete the project
