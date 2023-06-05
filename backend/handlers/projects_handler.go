@@ -140,7 +140,38 @@ func GetProjectByIDHandler(c *gin.Context) {
 }
 
 func updateProjectHandler(c *gin.Context) {
-	// logic to update a project
+	// get project id from url
+	projectID := c.Param("id")
+
+	// parse json request
+	var project models.Project
+	if err := c.ShouldBindJSON(&project); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Printf("Error with parsing JSON, %v", err)
+		return
+	}
+
+	db := database.SetupDB()
+	defer db.Close()
+
+	// get current state of project
+	// compare it and change what is needed
+
+	// then update things
+
+	// prepare query
+	stmt, err := db.Prepare("UPDATE projects SET name = ?, description = ?, ModifiedOn = ? WHERE ID = ?")
+	defer stmt.Close()
+	if checkErr(c, err, "Statement preparation failed!") {
+		return
+	}
+	currentTime := getCurrentTime()
+	// execute statement
+	result, err := stmt.Exec(project.Name, project.Description, project.Author, currentTime, currentTime)
+	if checkErr(c, err, "Statement execution failed!") {
+		return
+	}
+
 }
 
 func deleteProjectHandler(c *gin.Context) {
