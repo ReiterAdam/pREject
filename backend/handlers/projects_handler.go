@@ -135,11 +135,13 @@ func GetProjectByIDHandler(c *gin.Context) {
 		project.CustomProperties = append(project.CustomProperties, models.Property{Key: key, Value: value})
 	}
 
+	log.Print(project)
+
 	c.JSON(http.StatusOK, gin.H{"project": project})
 
 }
 
-func updateProjectHandler(c *gin.Context) {
+func UpdateProjectHandler(c *gin.Context) {
 	// get project id from url
 	projectID := c.Param("id")
 
@@ -161,10 +163,10 @@ func updateProjectHandler(c *gin.Context) {
 
 	// prepare query
 	stmt, err := db.Prepare("UPDATE projects SET name = ?, description = ?, ModifiedOn = ? WHERE ID = ?")
-	defer stmt.Close()
 	if checkErr(c, err, "Statement preparation failed!") {
 		return
 	}
+	defer stmt.Close()
 	currentTime := getCurrentTime()
 	// execute statement
 	_, err = stmt.Exec(project.Name, project.Description, currentTime, projectID)
@@ -196,7 +198,7 @@ func updateProjectHandler(c *gin.Context) {
 
 }
 
-func deleteProjectHandler(c *gin.Context) {
+func DeleteProjectHandler(c *gin.Context) {
 	// Get the project ID from the request URL
 	projectID := c.Param("id")
 

@@ -10,6 +10,7 @@ import (
 	"github.com/ReiterAdam/pREject/backend/handlers"
 	"github.com/ReiterAdam/pREject/backend/models"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateProjectHandler(t *testing.T) {
@@ -66,7 +67,6 @@ func TestGetProjectsHandler(t *testing.T) {
 	}
 }
 
-// check this test bc I dont know if it is ok
 func TestGetProjectByIDHandler(t *testing.T) {
 
 	// create new gin router
@@ -85,4 +85,53 @@ func TestGetProjectByIDHandler(t *testing.T) {
 		t.Errorf("Expected status code %d, but got %d", http.StatusOK, res.Code)
 
 	}
+}
+
+func TestUpdateProjectHandler(t *testing.T) {
+
+	// create new gin router
+	router := gin.Default()
+	// set up handler
+	router.PUT("/projects/:id", handlers.UpdateProjectHandler)
+
+	project := models.Project{
+		ID:          3,
+		Name:        "Updated project name",
+		Description: "Updated project description",
+		CustomProperties: []models.Property{
+			{Key: "property1", Value: "updated-value1"},
+			{Key: "property2", Value: "Updated-value2"},
+		},
+	}
+
+	payload, _ := json.Marshal(project)
+
+	// create request, response
+
+	req, _ := http.NewRequest("PUT", "/projects/2", bytes.NewBuffer(payload))
+	res := httptest.NewRecorder()
+
+	router.ServeHTTP(res, req)
+
+	// if res.Code != http.StatusOK {
+	// 	t.Errorf("Expected status code %d, but got %d", http.StatusOK, res.Code)
+
+	// }
+
+	// assert response status code
+	assert.Equal(t, http.StatusOK, res.Code)
+
+	// decode response body
+	var response struct {
+		Message string `json:"message"`
+	}
+
+	err := json.Unmarshal(res.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// assert the response message
+	expectedMessage := "Project updated successfully"
+	assert.Equal(t, expectedMessage, response.Message)
 }

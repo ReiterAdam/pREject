@@ -17,9 +17,7 @@ func setupRoutes() {
 	// get a project by ID
 	router.GET("/projects/:id", getProjectByIDHandler)
 
-	// update project
-
-	// get a project by ID
+	// update project by ID
 	router.PUT("/projects/:id", updateProjectHandler)
 
 	// delete project
